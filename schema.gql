@@ -1,0 +1,18 @@
+type Quote {
+	quote: String!
+	author: String!
+}
+
+type Query {
+	allQuotes: [Quote!]
+	allKeysSwitches: [KeySwitch!]
+}
+
+type KeySwitch {
+	name: String!
+	type: String!
+	brand: String!
+	compatibility: String!
+	actuationForce: String!
+	pcbMounted: String
+}
