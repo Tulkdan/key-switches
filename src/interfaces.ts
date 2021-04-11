@@ -6,3 +6,7 @@ export interface IKeySwitch {
   actuationForce: string;
   pcbMounted: string;
 }
+
+export interface IKeySwitchDB extends IKeySwitch {
+  _id: string;
+}

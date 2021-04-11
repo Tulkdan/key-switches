@@ -1,4 +1,4 @@
-import { IKeySwitch } from "./interfaces.ts";
+import { IKeySwitch, IKeySwitchDB } from "./interfaces.ts";
 
 export async function createKeySwitch(
   {
@@ -11,12 +11,7 @@ export async function createKeySwitch(
   }: IKeySwitch,
 ): Promise<
   {
-    name?: string;
-    type?: string;
-    brand?: string;
-    compatibility?: string;
-    actuationForce?: string;
-    pcbMounted?: string;
+    data?: IKeySwitchDB;
     error?: string;
   }
 > {
@@ -30,6 +25,7 @@ export async function createKeySwitch(
         actuationForce: $actuationForce,
         pcbMounted: $pcbMounted,
       }) {
+        _id,
         name,
         type,
         brand,
@@ -40,27 +36,31 @@ export async function createKeySwitch(
     }
   `;
 
-  const { data, error } = await queryFauna<any>(query, {
-    name,
-    type,
-    brand,
-    compatibility,
-    actuationForce,
-    pcbMounted,
-  });
+  const { data, error } = await queryFauna<{ createKeySwitch: IKeySwitchDB }>(
+    query,
+    {
+      name,
+      type,
+      brand,
+      compatibility,
+      actuationForce,
+      pcbMounted,
+    },
+  );
 
   if (error) {
     return { error };
   }
 
-  return data;
+  return { data: data?.createKeySwitch };
 }
 
 export async function getAllKeySwitches() {
   const query = `
     query {
-      allKeysSwitches {
+      allKeysSwitches(_size: 20) {
         data {
+          _id,
           name,
           type,
           brand,
@@ -82,6 +82,62 @@ export async function getAllKeySwitches() {
   }
 
   return { switches: data?.allKeysSwitches.data };
+}
+
+export async function getSwitchById(id: string) {
+  const query = `
+    query($switchId: ID!) {
+      findKeySwitchByID(id: $switchId) {
+        name
+        actuationForce
+        brand
+        compatibility
+        pcbMounted
+        type
+      }
+    }
+  `;
+
+  const {
+    data,
+    error,
+  } = await queryFauna<{ findKeySwitchByID: IKeySwitch }>(query, {
+    switchId: id,
+  });
+
+  if (error) {
+    return { error };
+  }
+
+  return { switch: data?.findKeySwitchByID };
+}
+
+export async function deleteSwitchById(id: string) {
+  const query = `
+    mutation($switchId: ID!) {
+      deleteKeySwitch(id: $switchId) {
+        name
+        actuationForce
+        brand
+        compatibility
+        pcbMounted
+        type
+      }
+    }
+  `;
+
+  const {
+    data,
+    error,
+  } = await queryFauna<{ deleteKeySwitch: IKeySwitch }>(query, {
+    switchId: id,
+  });
+
+  if (error) {
+    return { error };
+  }
+
+  return { data: data?.deleteKeySwitch };
 }
 
 async function queryFauna<T>(

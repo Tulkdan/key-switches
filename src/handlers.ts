@@ -22,12 +22,7 @@ export async function handleSwitches(request: Request) {
 
   if (request.method === "POST") {
     const {
-      name,
-      actuationForce,
-      brand,
-      compatibility,
-      pcbMounted,
-      type,
+      data,
       error,
     } = await createKeySwitch(
       body as {
@@ -42,14 +37,7 @@ export async function handleSwitches(request: Request) {
     if (error) {
       return json({ message: "couldn't create the quote", error }, { status: 500 });
     }
-    return json({
-      name,
-      actuationForce,
-      brand,
-      compatibility,
-      pcbMounted,
-      type,
-    }, { status: 201 });
+    return json({ ...data }, { status: 201 });
   }
 
   {
